@@ -1,7 +1,7 @@
 <resources>
-    <string name="app_name">NovaRebuild</string>
-    <string name="settings_title">NovaRebuild Settings</string>
-    <string name="accessibility_label">NovaRebuild gestures</string>
+    <string name="app_name">Pulsar</string>
+    <string name="settings_title">Pulsar Settings</string>
+    <string name="accessibility_label">Pulsar gestures</string>
     <string name="accessibility_description">Lets the launcher expand the notification shade and lock the screen when you swipe or double-tap the workspace.</string>
 
     <string name="drawer_search_hint">Search apps</string>
@@ -21,7 +21,7 @@
     <string name="menu_new_tab">New drawer tab…</string>
     <string name="menu_remove_tab">Remove tab</string>
     <string name="widgets_title">Widgets</string>
-    <string name="widget_bind_permission">Allow NovaRebuild to bind widgets</string>
+    <string name="widget_bind_permission">Allow Pulsar to bind widgets</string>
     <string name="widget_failed">Could not place widget</string>
     <string name="menu_rename_tab">Rename tab…</string>
     <string name="empty_drawer">No apps match that search</string>
@@ -47,7 +47,7 @@
     <string name="pref_backup">Backup &amp; restore</string>
     <string name="pref_backup_create">Back up launcher data</string>
     <string name="pref_backup_restore">Restore from backup</string>
-    <string name="pref_backup_summary">Writes favorites, folders, drawer tabs and settings into a .novarebuild archive.</string>
+    <string name="pref_backup_summary">Writes favorites, folders, drawer tabs and settings into a .pulsar archive.</string>
     <string name="pref_reset">Reset layout and settings</string>
     <string name="backup_saved">Backup written</string>
     <string name="backup_failed">Backup failed: %1$s</string>

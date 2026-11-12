@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<dev.novare.launcher.ui.DragLayer xmlns:android="http://schemas.android.com/apk/res/android"
+<dev.pulsar.launcher.ui.DragLayer xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/drag_layer"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
@@ -9,7 +9,7 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-    <dev.novare.launcher.ui.PagedView
+    <dev.pulsar.launcher.ui.PagedView
         android:id="@+id/workspace"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -30,7 +30,7 @@
             android:layout_marginBottom="6dp"
             android:orientation="horizontal" />
 
-        <dev.novare.launcher.ui.CellLayout
+        <dev.pulsar.launcher.ui.CellLayout
             android:id="@+id/hotseat"
             android:layout_width="match_parent"
             android:layout_height="96dp"
@@ -42,13 +42,13 @@
 
     </LinearLayout>
 
-    <dev.novare.launcher.ui.AllAppsView
+    <dev.pulsar.launcher.ui.AllAppsView
         android:id="@+id/all_apps"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:visibility="gone" />
 
-    <dev.novare.launcher.ui.FolderView
+    <dev.pulsar.launcher.ui.FolderView
         android:id="@+id/folder_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -66,4 +66,4 @@
         android:src="@drawable/ic_delete"
         android:visibility="gone" />
 
-</dev.novare.launcher.ui.DragLayer>
+</dev.pulsar.launcher.ui.DragLayer>

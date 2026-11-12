@@ -3,10 +3,10 @@ plugins {
 }
 
 android {
-    namespace = "dev.novare.testpack"
+    namespace = "dev.pulsar.testpack"
     compileSdk = 36
     defaultConfig {
-        applicationId = "dev.novare.testpack"
+        applicationId = "dev.pulsar.testpack"
         minSdk = 26
         targetSdk = 34
         versionCode = 1

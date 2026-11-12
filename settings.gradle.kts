@@ -14,7 +14,7 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "NovaRebuild"
+rootProject.name = "Pulsar"
 include(":app")
 include(":testpack")
 

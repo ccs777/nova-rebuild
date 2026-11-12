@@ -32,7 +32,7 @@ installed, so decompilation used `jadx 1.5.6` and manifest decoding used `aapt2`
 `com.teslacoilsw.launcher.{preferences,drawer.drawergroups,theme,search,screenoff,wallpaper}`.
 Manifest inventory: 42 activities, 16 receivers, 11 services, 6 providers
 (`evidence/manifest.xmltree`). Notable entries: `LauncherProvider`, `SecondaryDisplayLauncher`,
-`SessionCommitReceiver`, `AppWidgetsRestoredReceiver`, `NovaAccessibilityService`,
+`SessionCommitReceiver`, `AppWidgetsRestoredReceiver`, `PulsarAccessibilityService`,
 `NotificationListener`, `RestoreBackupFileHandler`, `DrawerTabSetupActivity`,
 `GroupAppListActivity`, and the bundled Sesame bridge
 (`ninja.sesame.lib.bridge.v1.access.*`), Tesladirect licensing, Branch, Spotify SDK, Places.
@@ -46,17 +46,17 @@ appWidgetId INTEGER NOT NULL DEFAULT -1,iconPackage TEXT,iconResource TEXT,icon 
 appWidgetProvider TEXT,modified INTEGER NOT NULL DEFAULT 0,restored INTEGER NOT NULL DEFAULT 0,
 profileId INTEGER DEFAULT -1,rank INTEGER NOT NULL DEFAULT 0,options INTEGER NOT NULL DEFAULT 0,
 appWidgetSource INTEGER NOT NULL DEFAULT -1, customIconSource TEXT, customIconLoadedState TEXT,
-flingUpIntent TEXT,flingDownIntent TEXT,zOrder INTEGER DEFAULT 0,novaFlags INTEGER NOT NULL DEFAULT 0);
+flingUpIntent TEXT,flingDownIntent TEXT,zOrder INTEGER DEFAULT 0,pulsarFlags INTEGER NOT NULL DEFAULT 0);
 ```
 
 Sibling tables: `allapps`, `appgroups`, `drawer_groups`, `customIcons` (with `flags`,
 `modified`, `tabColor`, `customIconSource`). Containers are the AOSP negatives
 (`DESKTOP=-100`, `HOTSEAT=-101`) with folder children referencing the folder row id.
 
-**Backup format.** `.novabackup` is a ZIP: `gd/m.java` writes `nova.xml` (prefs map, minus
-`bug_report_userid`), `supportDetails.txt`, and the database files; restore reads `nova.xml` /
-`com.teslacoilsw.launcher_preferences.xml` and unpacks to `restored/nova.db`. Declared MIME:
-`application/vnd.novalauncher.backup`. Icon export is a separate `novaIconExport.zip`.
+**Backup format.** `.pulsarbackup` is a ZIP: `gd/m.java` writes `pulsar.xml` (prefs map, minus
+`bug_report_userid`), `supportDetails.txt`, and the database files; restore reads `pulsar.xml` /
+`com.teslacoilsw.launcher_preferences.xml` and unpacks to `restored/pulsar.db`. Declared MIME:
+`application/vnd.pulsar.backup`. Icon export is a separate `pulsarIconExport.zip`.
 
 **Icon packs.** Discovery via `org.adw.launcher.THEMES`, `com.gau.go.launcherex.theme`,
 `com.anddoes.launcher.THEME`; per-component mapping from `appfilter.xml`
@@ -68,21 +68,21 @@ swipe-edge and swipe-up/down actions (`swipeEdge`, `swipeToOpen`, `LAUNCHER_ALLA
 
 ## What was rebuilt
 
-`build/novarebuild` is a two-module Gradle project: the launcher (`dev.novare.launcher`) and a
-synthetic ADW icon pack (`dev.novare.testpack`) used to prove pack loading.
+`build/pulsar` is a two-module Gradle project: the launcher (`dev.pulsar.launcher`) and a
+synthetic ADW icon pack (`dev.pulsar.testpack`) used to prove pack loading.
 
 | Nova evidence | Rebuild |
 |---|---|
 | `favorites` DDL + container scheme | `db/LauncherDb.kt` (same columns), `db/LauncherStore.kt` (folder rows reference parent id) |
 | `drawer_groups` / `appgroups` | `DrawerTab`, tab bar, per-tab filtering |
 | `customIcons` | `customIcons` table + SAF icon override in `IconCache` |
-| `.novabackup` ZIP with `nova.xml` + DB | `BackupManager` ZIP with `meta.json`, `favorites.json`, `nova.xml` |
+| `.pulsarbackup` ZIP with `pulsar.xml` + DB | `BackupManager` ZIP with `meta.json`, `favorites.json`, `pulsar.xml` |
 | `appfilter.xml`, iconback/mask/upon | `app/IconPackManager.kt`, `ui/ComposedIconDrawable.kt` |
 | launcher3 `Workspace`/`CellLayout`/`DragLayer` | `ui/CellLayout.kt`, `ui/PagedView.kt`, `ui/DragLayer.kt`, `ui/DragController.kt` |
 | swipe gestures | `DragLayer` vertical-swipe detection + `LauncherAccessibilityService` global action |
 
 Deliberate deviations: item graph is serialized as JSON inside the backup ZIP (readable across
-schema changes) instead of copying `nova.db`; resource names are not obfuscated; the launcher
+schema changes) instead of copying `pulsar.db`; resource names are not obfuscated; the launcher
 targets `targetSdk 34` rather than 33.
 
 ## Verification ledger
@@ -95,9 +95,9 @@ Device A — Galaxy S23 (`RZCW91F71WX`, 1080×2340), screenshots and UI dumps in
 - Drag icon onto icon creates a folder; DB: folder row `container=-100`, children `container=1`.
 - Long-press icon → Edit / Change icon / App info / Uninstall / Remove; long-press empty → menu at touch point.
 - Settings: Columns 5 → 4 applied and reflowed; 6 tested; backup section and dynamic icon-pack list render.
-- Backup: wrote `nova-2026-11-11_23-02.novarebuild.zip` to Downloads (798 B, entries verified).
+- Backup: wrote `nova-2026-11-11_23-02.pulsar.zip` to Downloads (798 B, entries verified).
 - Restore: after 6 columns + an extra desktop item, restore returned prefs to `workspace_columns=5`, removed the extra item, kept the 4 dock apps.
-- Icon pack: `dev.novare.testpack` discovered, selected, Calculator icon rendered its drawable (magenta/cyan pixels at `(286,786)-(380,880)`).
+- Icon pack: `dev.pulsar.testpack` discovered, selected, Calculator icon rendered its drawable (magenta/cyan pixels at `(286,786)-(380,880)`).
 - Drawer tab: created `utilities` (`drawer_groups` row), `appgroups` membership filtered the grid to Chrome.
 
 Device B — Haptique RS90 (`ODA2101250116T0629`, Android 12, 480×800 @220 dpi): app runs with the

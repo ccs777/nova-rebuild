@@ -14,11 +14,11 @@ val keystoreProperties = Properties().apply {
 }
 
 android {
-    namespace = "dev.novare.launcher"
+    namespace = "dev.pulsar.launcher"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "dev.novare.launcher"
+        applicationId = "dev.pulsar.launcher"
         minSdk = 26
         targetSdk = 35
         versionCode = 1

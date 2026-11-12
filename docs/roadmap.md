@@ -11,7 +11,7 @@ Milestones ordered by what blocks daily use. Each one ends with a device gate; n
 | M3 Shortcuts | deep + legacy shortcuts, per-item swipe-up action | shortcut launches and survives reload |
 | M4 Icons | normalization, adaptive shape override, mask fallback | mixed pack/unpacked icons render at equal weight |
 | M5 State & displays | `onSaveInstanceState`, landscape/tablet grids, secondary display | process kill with drawer open restores to the drawer |
-| M6 Parity extras | read Nova's own `.novabackup`, search providers, settings search | import a real Nova backup |
+| M6 Parity extras | read Nova's own `.pulsarbackup`, search providers, settings search | import a real Nova backup |
 
 ## Status
 
@@ -39,4 +39,4 @@ Milestones ordered by what blocks daily use. Each one ends with a device gate; n
 - `LauncherActivity` still rebuilds every page after a mutation; M1 replaces that with model
   callbacks.
 - Widget bind permission flow (`ACTION_APPWIDGET_BIND`) is not wired yet.
-- Backup stores `favorites.json` rather than a `nova.db` copy; M6 adds a Nova-format reader.
+- Backup stores `favorites.json` rather than a `pulsar.db` copy; M6 adds a Nova-format reader.
