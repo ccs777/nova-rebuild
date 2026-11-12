@@ -19,6 +19,9 @@
     <string name="menu_add_to_tab">Add to tab…</string>
     <string name="menu_new_tab">New drawer tab…</string>
     <string name="menu_remove_tab">Remove tab</string>
+    <string name="widgets_title">Widgets</string>
+    <string name="widget_bind_permission">Allow NovaRebuild to bind widgets</string>
+    <string name="widget_failed">Could not place widget</string>
     <string name="menu_rename_tab">Rename tab…</string>
     <string name="empty_drawer">No apps match that search</string>
     <string name="empty_folder">Drag apps here</string>

@@ -34,6 +34,9 @@ open class ItemInfo(
     var intent: Intent? = null,
     var profileId: Long = -1L,
     var customIconUri: String? = null,
+    var appWidgetId: Int = -1,
+    var appWidgetProvider: ComponentName? = null,
+    var appWidgetSource: Int = -1,
 )
 
 class AppItem(

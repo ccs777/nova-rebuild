@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.database.Cursor
+import android.database.sqlite.SQLiteDatabase
 import dev.novare.launcher.model.AppItem
 import dev.novare.launcher.model.Container
 import dev.novare.launcher.model.DrawerTab
@@ -34,11 +35,13 @@ class LauncherStore(context: Context) {
                 if (container == Container.DESKTOP || container == Container.HOTSEAT) {
                     val item = if (itemType == ItemType.FOLDER) FolderItem() else appItemFrom(c) ?: continue
                     readCommon(item, c)
+                    item.id = id
                     if (item is FolderItem) folders[id] = item
                     if (container == Container.DESKTOP) layout.desktop.add(item) else layout.hotseat.add(item)
                 } else if (container > 0) {
                     val child = appItemFrom(c) ?: continue
                     readCommon(child, c)
+                    child.id = id
                     children.add(container.toLong() to child)
                 }
             }
@@ -120,6 +123,117 @@ class LauncherStore(context: Context) {
         db.delete("customIcons", null, null)
     }
 
+    /**
+     * Insert-or-replace one favorites row. An item without an id gets the next
+     * row id assigned, so callers can add graph nodes one at a time without
+     * going through [save].
+     */
+    fun upsert(item: ItemInfo, container: Int, rank: Int) {
+        val db = helper.writableDatabase
+        if (item.id <= 0L) item.id = nextFavoriteId(db)
+        val values = valuesFor(item, container, if (container == Container.HOTSEAT) 0 else item.screen, rank)
+        values.put("appWidgetId", item.appWidgetId)
+        values.put("appWidgetSource", item.appWidgetSource)
+        if (item.appWidgetProvider != null) {
+            values.put("appWidgetProvider", item.appWidgetProvider?.flattenToString())
+        } else {
+            values.putNull("appWidgetProvider")
+        }
+        db.insertWithOnConflict("favorites", null, values, SQLiteDatabase.CONFLICT_REPLACE)
+    }
+
+    fun deleteById(id: Long) {
+        if (id <= 0L) return
+        helper.writableDatabase.delete("favorites", "_id=?", arrayOf(id.toString()))
+    }
+
+    /** Updates geometry and rank of the given rows in a single transaction. */
+    fun updatePositions(items: List<ItemInfo>) {
+        if (items.isEmpty()) return
+        val db = helper.writableDatabase
+        db.beginTransaction()
+        try {
+            for (item in items) {
+                if (item.id <= 0L) continue
+                db.update(
+                    "favorites", ContentValues().apply {
+                        put("screen", item.screen)
+                        put("cellX", item.cellX)
+                        put("cellY", item.cellY)
+                        put("spanX", item.spanX)
+                        put("spanY", item.spanY)
+                        put("rank", item.rank)
+                    }, "_id=?", arrayOf(item.id.toString())
+                )
+            }
+            db.setTransactionSuccessful()
+        } finally {
+            db.endTransaction()
+        }
+    }
+
+    /** Inserts or replaces a drawer group and rewrites its component rows. */
+    fun upsertDrawerTab(tab: DrawerTab, orderIndex: Int) {
+        val db = helper.writableDatabase
+        db.beginTransaction()
+        try {
+            val values = ContentValues().apply {
+                put("name", tab.name)
+                put("orderIndex", orderIndex)
+                if (tab.id > 0L) put("_id", tab.id)
+            }
+            if (tab.id > 0L) {
+                db.insertWithOnConflict("drawer_groups", null, values, SQLiteDatabase.CONFLICT_REPLACE)
+            } else {
+                tab.id = db.insertOrThrow("drawer_groups", null, values)
+            }
+            db.delete("appgroups", "groupId=?", arrayOf(tab.id.toString()))
+            for (component in tab.components) {
+                db.insertOrThrow(
+                    "appgroups", null, ContentValues().apply {
+                        put("groupId", tab.id)
+                        put("component", component)
+                    }
+                )
+            }
+            db.setTransactionSuccessful()
+        } finally {
+            db.endTransaction()
+        }
+    }
+
+    fun deleteDrawerTab(id: Long) {
+        if (id <= 0L) return
+        val db = helper.writableDatabase
+        db.beginTransaction()
+        try {
+            db.delete("appgroups", "groupId=?", arrayOf(id.toString()))
+            db.delete("drawer_groups", "_id=?", arrayOf(id.toString()))
+            db.setTransactionSuccessful()
+        } finally {
+            db.endTransaction()
+        }
+    }
+
+    fun upsertCustomIcon(component: String, uri: String) {
+        helper.writableDatabase.insertWithOnConflict(
+            "customIcons", null, ContentValues().apply {
+                put("component", component)
+                put("iconPackage", uri)
+                putNull("iconResource")
+            }, SQLiteDatabase.CONFLICT_REPLACE
+        )
+    }
+
+    fun deleteCustomIcon(component: String) {
+        helper.writableDatabase.delete("customIcons", "component=?", arrayOf(component))
+    }
+
+    private fun nextFavoriteId(db: SQLiteDatabase): Long =
+        db.rawQuery("SELECT MAX(_id) FROM favorites", null).use { c ->
+            if (c.moveToFirst()) c.getLong(0) + 1L else 1L
+        }
+
     private fun valuesFor(item: ItemInfo, container: Int, screen: Int, rank: Int): ContentValues =
         ContentValues().apply {
             put("_id", item.id)
@@ -155,6 +269,7 @@ class LauncherStore(context: Context) {
 
     private fun readCommon(item: ItemInfo, c: Cursor) {
         item.title = c.getString(c.getColumnIndexOrThrow("title")) ?: ""
+        item.container = c.getInt(c.getColumnIndexOrThrow("container"))
         item.screen = c.getInt(c.getColumnIndexOrThrow("screen"))
         item.cellX = c.getInt(c.getColumnIndexOrThrow("cellX"))
         item.cellY = c.getInt(c.getColumnIndexOrThrow("cellY"))

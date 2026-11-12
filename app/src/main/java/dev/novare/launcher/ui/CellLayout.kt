@@ -30,8 +30,11 @@ class CellLayout @JvmOverloads constructor(
     var iconProvider: ((ItemInfo) -> Drawable?)? = null
     var labelProvider: ((ItemInfo) -> String)? = null
 
+    /** Supplies a live view for widget cells; icons are built internally. */
+    var widgetViewProvider: ((ItemInfo) -> View?)? = null
+
     private var occupancy: Array<Array<ItemInfo?>> = Array(rows) { arrayOfNulls(columns) }
-    private val itemViews = LinkedHashMap<ItemInfo, AppIconView>()
+    private val itemViews = LinkedHashMap<ItemInfo, View>()
     private var cellWidth = 0f
     private var cellHeight = 0f
 
@@ -66,9 +69,20 @@ class CellLayout @JvmOverloads constructor(
         requestLayout()
     }
 
-    fun viewFor(item: ItemInfo): AppIconView? = itemViews[item]
+    fun viewFor(item: ItemInfo): View? = itemViews[item]
 
-    private fun createView(item: ItemInfo): AppIconView {
+    private fun createView(item: ItemInfo): View {
+        val widget = widgetViewProvider?.invoke(item)
+        if (widget != null) {
+            widget.isClickable = true
+            widget.isLongClickable = true
+            widget.setOnClickListener { onItemClick?.invoke(item) }
+            widget.setOnLongClickListener { target ->
+                performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+                onItemLongClick?.invoke(item, target) ?: false
+            }
+            return widget
+        }
         val view = AppIconView(context)
         view.isClickable = true
         view.bind(item, iconProvider?.invoke(item), iconSizePx, labelProvider?.invoke(item) ?: item.title)
@@ -78,6 +92,16 @@ class CellLayout @JvmOverloads constructor(
             onItemLongClick?.invoke(item, it) ?: false
         }
         return view
+    }
+
+    /** Re-binds one cell in place instead of rebuilding the page. */
+    fun refreshItem(item: ItemInfo) {
+        val view = itemViews[item] ?: return
+        if (view is AppIconView) {
+            view.bind(item, iconProvider?.invoke(item), iconSizePx, labelProvider?.invoke(item) ?: item.title)
+        } else {
+            view.requestLayout()
+        }
     }
 
     fun addItem(item: ItemInfo, preferredX: Int? = null, preferredY: Int? = null): Boolean {

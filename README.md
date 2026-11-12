@@ -7,11 +7,15 @@ Material dependency; one launcher module plus a synthetic icon pack used by the 
 ## Build
 
 ```bash
-export JAVA_HOME=$(/usr/libexec/java_home -v 17)
 printf 'sdk.dir=%s\n' "$HOME/Library/Android/sdk" > local.properties
-~/.gradle/wrapper/dists/gradle-8.13-bin/*/gradle-8.13/bin/gradle :app:assembleDebug
+./gradlew :app:assembleDebug          # debug APK
+./gradlew :app:testDebugUnitTest      # Robolectric suites
+./gradlew :app:assembleRelease        # signed when keystore.properties is present
 adb install -r app/build/outputs/apk/debug/app-debug.apk
 ```
+
+`keystore.properties` (git-ignored, repo root) supplies `storeFile`, `storePassword`, `keyAlias`,
+`keyPassword`; without it `assembleRelease` still builds, unsigned.
 
 `testpack` builds a minimal ADW icon pack (`dev.novare.testpack`) for exercising icon-pack
 loading:
@@ -44,10 +48,16 @@ is a normal launcher: set it as the default home app to use it as HOME.
   replaces the item graph and preferences.
 - **Gestures** — swipe up opens the drawer; swipe down asks the accessibility service to expand
   the notification shade.
+- **Widgets** — long-press an empty cell → *Widgets*, pick a provider, grant the bind permission
+  when asked; the widget is hosted by `AppWidgetHost` in a `WidgetFrame` with a resize handle and
+  drag support. Widget ids persist in `favorites.appWidgetId` and are re-bound on load.
 
 ## Data model
 
-`LauncherDb` uses the `favorites` schema recovered from the Nova artifact (including
+`LauncherModel` owns the in-memory graph and writes only the rows a mutation touches
+(`upsert`/`deleteById`/`updatePositions`), emitting `LauncherChange` callbacks so the activity
+rebinds one page instead of the whole workspace. `LauncherDb` uses the `favorites` schema
+recovered from the Nova artifact (including
 `flingUpIntent`, `flingDownIntent`, `zOrder`, `novaFlags`), plus `drawer_groups`, `appgroups` and
 `customIcons`. Containers follow the AOSP negatives: `DESKTOP=-100`, `HOTSEAT=-101`; a folder's
 children carry the folder row id as their container. `customIcons` stores a
@@ -98,6 +108,8 @@ app/src/main/java/dev/novare/launcher/
 
 ## Known limits
 
-Widgets (`AppWidgetHost`), span resizing, notification badges, Sesame integrations and Nova's
-scroll effects are not implemented. The backup format matches Nova's ZIP-with-prefs shape but
-stores the item graph as JSON rather than copying `nova.db`.
+Shortcuts, notification badges, Sesame integrations and Nova's scroll effects are not implemented.
+Widget placement and the bind-permission flow are exercised on device; widget span resize and
+widget re-binding after process death are implemented but not yet verified. The backup format
+matches Nova's ZIP-with-prefs shape but stores the item graph as JSON rather than copying
+`nova.db`.
