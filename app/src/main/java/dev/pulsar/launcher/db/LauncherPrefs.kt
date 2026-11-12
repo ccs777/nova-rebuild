@@ -18,7 +18,7 @@ class LauncherPrefs(private val context: Context) {
         set(value) = prefs.edit().putString("workspace_columns", value.toString()).apply()
 
     var gridRows: Int
-        get() = prefs.getString("workspace_rows", "5")?.toIntOrNull() ?: 5
+        get() = prefs.getString("workspace_rows", null)?.toIntOrNull() ?: if (narrowScreen) 4 else 5
         set(value) = prefs.edit().putString("workspace_rows", value.toString()).apply()
 
     var dockCount: Int
@@ -26,7 +26,7 @@ class LauncherPrefs(private val context: Context) {
         set(value) = prefs.edit().putString("dock_count", value.toString()).apply()
 
     var iconSizeDp: Int
-        get() = prefs.getString("icon_size", null)?.toIntOrNull() ?: if (narrowScreen) 52 else 48
+        get() = prefs.getString("icon_size", null)?.toIntOrNull() ?: if (narrowScreen) 60 else 48
         set(value) = prefs.edit().putString("icon_size", value.toString()).apply()
 
     fun getFirstRunDone(): Boolean = prefs.getBoolean("first_run_done", false)
