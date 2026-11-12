@@ -40,3 +40,30 @@ Milestones ordered by what blocks daily use. Each one ends with a device gate; n
   callbacks.
 - Widget bind permission flow (`ACTION_APPWIDGET_BIND`) is not wired yet.
 - Backup stores `favorites.json` rather than a `pulsar.db` copy; M6 adds a Nova-format reader.
+
+## Backlog: Octopi review (unscheduled)
+
+Features observed in Octopi Launcher (Home Screens) from its
+[store listing](https://appgoblin.info/apps/com.otp.octopilauncher) and
+[APKMirror changelogs](https://www.apkmirror.com/apk/octopiappfactory/octopi-launcher/). Not yet
+assigned to a milestone; each needs a device gate before it counts as done.
+
+| Area | Feature | Notes |
+|---|---|---|
+| Widgets | auto-scrolling widget stacks | depends on M2 widget hosting |
+| Widgets | floating or pinned widgets above the home screen | depends on M2 |
+| Widgets | glass-style widget backgrounds | cosmetic |
+| Drawer | folders and favorites inside the drawer | `drawer_groups` already covers tabs |
+| Drawer | tag-based app organization | extends `appgroups` |
+| Drawer | index bar and reachability mode | |
+| Gestures | swipe on an icon to launch a different app | per-item swipe action, pairs with M3 |
+| Gestures | screen-off via AccessibilityService | `LauncherAccessibilityService` already exists |
+| Layouts | separate portrait and landscape layouts | pairs with M5 |
+| Layouts | foldable layouts per screen | pairs with M5 |
+| Profiles | private space and work profile support | |
+| Icons | resizable individual home icons | `spanX/spanY` model |
+| Icons | hide status and navigation bars | |
+| Icons | notification badges | needs notification listener access |
+| Home | lock the home layout against edits | |
+| Search | launch an app by a nickname | extends `search` providers in M6 |
+| Assistant | set the launcher as the assistant app | |
