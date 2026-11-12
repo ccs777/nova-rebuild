@@ -1,0 +1,54 @@
+<resources>
+    <string name="app_name">NovaRebuild</string>
+    <string name="settings_title">NovaRebuild Settings</string>
+    <string name="accessibility_label">NovaRebuild gestures</string>
+    <string name="accessibility_description">Lets the launcher expand the notification shade and lock the screen when you swipe or double-tap the workspace.</string>
+
+    <string name="drawer_search_hint">Search apps</string>
+    <string name="drawer_tab_all">All</string>
+    <string name="drawer_hidden">Hidden apps</string>
+    <string name="folder_default_name">Folder</string>
+    <string name="folder_rename">Rename folder</string>
+    <string name="menu_edit">Edit</string>
+    <string name="menu_change_icon">Change icon</string>
+    <string name="menu_app_info">App info</string>
+    <string name="menu_uninstall">Uninstall</string>
+    <string name="menu_remove">Remove from home</string>
+    <string name="menu_add_to_home">Add to home</string>
+    <string name="menu_hide_app">Hide from drawer</string>
+    <string name="menu_add_to_tab">Add to tab…</string>
+    <string name="menu_new_tab">New drawer tab…</string>
+    <string name="menu_remove_tab">Remove tab</string>
+    <string name="menu_rename_tab">Rename tab…</string>
+    <string name="empty_drawer">No apps match that search</string>
+    <string name="empty_folder">Drag apps here</string>
+    <string name="none">None</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Cancel</string>
+    <string name="remove">Remove</string>
+    <string name="apply">Apply</string>
+
+    <string name="pref_grid">Workspace grid</string>
+    <string name="pref_grid_cols">Columns</string>
+    <string name="pref_grid_rows">Rows</string>
+    <string name="pref_dock">Dock</string>
+    <string name="pref_dock_count">Dock icon count</string>
+    <string name="pref_icon_size">Icon size (dp)</string>
+    <string name="pref_gestures">Gestures</string>
+    <string name="pref_swipe_up">Swipe up on home opens the app drawer</string>
+    <string name="pref_swipe_down">Swipe down expands notifications (needs accessibility)</string>
+    <string name="pref_drawer">App drawer</string>
+    <string name="pref_drawer_tabs">Show drawer tabs</string>
+    <string name="pref_icon_pack">Icon pack</string>
+    <string name="pref_backup">Backup &amp; restore</string>
+    <string name="pref_backup_create">Back up launcher data</string>
+    <string name="pref_backup_restore">Restore from backup</string>
+    <string name="pref_backup_summary">Writes favorites, folders, drawer tabs and settings into a .novarebuild archive.</string>
+    <string name="pref_reset">Reset layout and settings</string>
+    <string name="backup_saved">Backup written</string>
+    <string name="backup_failed">Backup failed: %1$s</string>
+    <string name="restore_done">Restored from backup</string>
+    <string name="restore_failed">Restore failed: %1$s</string>
+    <string name="reset_done">Reset complete</string>
+    <string name="reset_confirm">Remove all home-screen items, folders, tabs and settings?</string>
+</resources>

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/pref_grid">
+        <ListPreference
+            android:defaultValue="5"
+            android:entries="@array/grid_columns_entries"
+            android:entryValues="@array/grid_columns_entries"
+            android:key="workspace_columns"
+            android:summary="%s"
+            android:title="@string/pref_grid_cols" />
+        <ListPreference
+            android:defaultValue="5"
+            android:entries="@array/grid_rows_entries"
+            android:entryValues="@array/grid_rows_entries"
+            android:key="workspace_rows"
+            android:summary="%s"
+            android:title="@string/pref_grid_rows" />
+        <ListPreference
+            android:defaultValue="4"
+            android:entries="@array/dock_count_entries"
+            android:entryValues="@array/dock_count_entries"
+            android:key="dock_count"
+            android:summary="%s"
+            android:title="@string/pref_dock_count" />
+        <ListPreference
+            android:defaultValue="48"
+            android:entries="@array/icon_size_entries"
+            android:entryValues="@array/icon_size_entries"
+            android:key="icon_size"
+            android:summary="%s"
+            android:title="@string/pref_icon_size" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_gestures">
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="swipe_up_drawer"
+            android:title="@string/pref_swipe_up" />
+        <SwitchPreferenceCompat
+            android:defaultValue="false"
+            android:key="swipe_down_notifications"
+            android:title="@string/pref_swipe_down" />
+    </PreferenceCategory>
+
+    <PreferenceCategory
+        android:key="cat_drawer"
+        android:title="@string/pref_drawer">
+        <SwitchPreferenceCompat
+            android:defaultValue="true"
+            android:key="drawer_tabs"
+            android:title="@string/pref_drawer_tabs" />
+        <Preference
+            android:key="hidden_apps"
+            android:title="@string/drawer_hidden" />
+    </PreferenceCategory>
+
+    <PreferenceCategory android:title="@string/pref_backup">
+        <Preference
+            android:key="backup_create"
+            android:summary="@string/pref_backup_summary"
+            android:title="@string/pref_backup_create" />
+        <Preference
+            android:key="backup_restore"
+            android:title="@string/pref_backup_restore" />
+        <Preference
+            android:key="reset"
+            android:title="@string/pref_reset" />
+    </PreferenceCategory>
+
+</PreferenceScreen>

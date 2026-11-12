@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="icon_bg">#00000000</color>
+    <color name="search_bg">#E6202028</color>
+    <color name="search_hint">#B3FFFFFF</color>
+    <color name="folder_bg">#F22A2A33</color>
+    <color name="dot_active">#FFFFFFFF</color>
+    <color name="dot_inactive">#59FFFFFF</color>
+    <color name="delete_bg">#CCE53935</color>
+    <color name="drawer_bg">#FF141418</color>
+    <color name="tab_selected">#FFFFFFFF</color>
+    <color name="tab_unselected">#8AFFFFFF</color>
+</resources>

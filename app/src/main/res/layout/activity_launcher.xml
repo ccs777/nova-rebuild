@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dev.novare.launcher.ui.DragLayer xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/drag_layer"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <dev.novare.launcher.ui.PagedView
+        android:id="@+id/workspace"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
+
+    <LinearLayout
+        android:id="@+id/bottom_bar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="8dp">
+
+        <LinearLayout
+            android:id="@+id/page_indicator"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="6dp"
+            android:orientation="horizontal" />
+
+        <dev.novare.launcher.ui.CellLayout
+            android:id="@+id/hotseat"
+            android:layout_width="match_parent"
+            android:layout_height="96dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp" />
+
+        <include layout="@layout/search_bar" />
+    </LinearLayout>
+
+    </LinearLayout>
+
+    <dev.novare.launcher.ui.AllAppsView
+        android:id="@+id/all_apps"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <dev.novare.launcher.ui.FolderView
+        android:id="@+id/folder_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+    <ImageView
+        android:id="@+id/delete_target"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:layout_gravity="top|center_horizontal"
+        android:layout_marginTop="48dp"
+        android:background="@drawable/bg_delete_target"
+        android:contentDescription="@string/menu_remove"
+        android:padding="18dp"
+        android:src="@drawable/ic_delete"
+        android:visibility="gone" />
+
+</dev.novare.launcher.ui.DragLayer>
