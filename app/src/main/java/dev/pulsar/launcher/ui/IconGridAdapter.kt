@@ -31,7 +31,10 @@ class IconGridAdapter : RecyclerView.Adapter<IconGridAdapter.Holder>() {
             ViewGroup.LayoutParams.MATCH_PARENT,
             ViewGroup.LayoutParams.WRAP_CONTENT,
         )
-        view.setPadding(4, 12, 4, 12)
+        val density = parent.resources.displayMetrics.density
+        val padH = (4 * density).toInt()
+        val padV = (6 * density).toInt()
+        view.setPadding(padH, padV, padH, padV)
         return Holder(view)
     }
 

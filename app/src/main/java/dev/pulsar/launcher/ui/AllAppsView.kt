@@ -74,9 +74,12 @@ class AllAppsView @JvmOverloads constructor(
         iconFor: (ItemInfo) -> Drawable?,
         labelFor: (ItemInfo) -> String,
     ) {
-        val columns = if (resources.configuration.screenWidthDp >= 600) 7 else 5
+        // Pick columns from the usable width so each cell keeps roughly TARGET_CELL_DP.
+        // Narrow phones (~350dp) get 4 columns, typical phones 5, tablets capped at 7.
+        val gridWidthDp = resources.configuration.screenWidthDp - GRID_SIDE_PADDING_DP
+        val columns = (gridWidthDp / TARGET_CELL_DP).coerceIn(4, 7)
         (grid.layoutManager as GridLayoutManager).spanCount = columns
-        adapter.iconSize = iconSizePx
+        adapter.iconSize = 0 // drawer icons fill ~85% of their cell
         adapter.iconProvider = iconFor
         adapter.labelProvider = labelFor
     }
@@ -184,4 +187,10 @@ class AllAppsView @JvmOverloads constructor(
     }
 
     private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
+
+    private companion object {
+        const val TARGET_CELL_DP = 72
+        // matches the drawer_grid's 8dp start and end padding in all_apps.xml
+        const val GRID_SIDE_PADDING_DP = 16
+    }
 }

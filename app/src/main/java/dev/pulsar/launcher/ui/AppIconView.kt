@@ -41,16 +41,20 @@ class AppIconView @JvmOverloads constructor(
         iconView.setImageDrawable(drawable)
         labelView.text = label
         labelView.visibility = if (label.isEmpty()) GONE else VISIBLE
+        // drawer (iconSizePx 0) uses larger labels to match the stock grid look
+        labelView.setTextSize(android.util.TypedValue.COMPLEX_UNIT_SP, if (iconSizePx <= 0) 14f else 12f)
         contentDescription = label
     }
 
     override fun onMeasure(widthMeasureSpec: Int, heightMeasureSpec: Int) {
+        // Grids (drawer, folder) measure cells with WRAP_CONTENT height, so the height spec
+        // carries no usable size. Clamp only by the cell width, which is always exact.
         val cellWidth = MeasureSpec.getSize(widthMeasureSpec)
-        val cellHeight = MeasureSpec.getSize(heightMeasureSpec)
-        val density = resources.displayMetrics.density
-        val labelSpace = if (labelView.text.isNullOrEmpty()) 0 else (density * 18).toInt()
-        val available = (minOf(cellWidth, cellHeight) - labelSpace).coerceAtLeast((density * 16).toInt())
-        val side = if (requestedIconSize <= 0) available else minOf(requestedIconSize, available)
+        val side = when {
+            cellWidth <= 0 -> requestedIconSize
+            requestedIconSize <= 0 -> (cellWidth * 0.85f).toInt()
+            else -> minOf(requestedIconSize, cellWidth)
+        }
         iconView.layoutParams = iconView.layoutParams.apply {
             this.width = side
             this.height = side
