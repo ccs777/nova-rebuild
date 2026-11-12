@@ -22,9 +22,17 @@ Milestones ordered by what blocks daily use. Each one ends with a device gate; n
 - M1: done. `LauncherModel` + `LauncherChange`, incremental store writes, `readCommon` now
   round-trips `container` and `_id` (both bugs caught by the new suite). Gate passed:
   `:app:testDebugUnitTest` green (6 tests) and the activity no longer calls `store.save`.
-- M2: placement + bind flow verified on device (picker → `AllowBindAppWidgetActivity` → hosted
-  Chrome search widget). Span resize and restore-time re-bind are implemented, not yet exercised.
-- M3–M6: not started.
+- M2: done. Placement + bind permission flow exercised on device (picker →
+  `AllowBindAppWidgetActivity` → hosted Chrome search widget); resizing the frame wrote 4x2 spans to
+  `favorites`; after a process kill the frame and its widget id were restored. Fixes found by the
+  gate: `AppWidgetHost` has no `deleteView` (detach instead), a host view cannot be re-parented
+  without removing it first, widget rows were dropped by `LauncherStore.load()` because they have
+  no intent, and widget restore ran before the host manager was constructed.
+- M3: shortcut discovery (`LauncherApps` first, legacy `ACTION_CREATE_SHORTCUT` fallback), picker
+  sheet, and "add to home" integrated into the item menu. Device gate not met on the RS90: it is
+  not the default home, so `hasShortcutHostPermission()` is false and only legacy shortcuts are
+  visible; needs a device where the launcher holds the role.
+- M4–M6: not started.
 
 ## Known debt
 

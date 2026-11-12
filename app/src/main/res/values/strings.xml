@@ -11,6 +11,7 @@
     <string name="folder_rename">Rename folder</string>
     <string name="menu_edit">Edit</string>
     <string name="menu_change_icon">Change icon</string>
+    <string name="menu_shortcuts">Shortcuts</string>
     <string name="menu_app_info">App info</string>
     <string name="menu_uninstall">Uninstall</string>
     <string name="menu_remove">Remove from home</string>

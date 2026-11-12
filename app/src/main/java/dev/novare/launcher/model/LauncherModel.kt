@@ -182,6 +182,21 @@ class LauncherModel(context: Context) {
     }
 
     /** First free anchor cell in reading order, creating a new screen when full. */
+    /** Writes one already-placed item back, e.g. after a widget id was re-bound. */
+    fun persistItem(item: ItemInfo) {
+        val container = when {
+            layout.hotseat.contains(item) -> Container.HOTSEAT
+            layout.desktop.contains(item) -> Container.DESKTOP
+            else -> item.container
+        }
+        val rank = when (container) {
+            Container.HOTSEAT -> layout.hotseat.indexOf(item)
+            Container.DESKTOP -> layout.desktop.indexOf(item)
+            else -> item.rank
+        }
+        store.upsert(item, container, rank)
+    }
+
     fun firstVacantCell(columns: Int, rows: Int): IntArray {
         val maxScreen = (layout.desktop.maxOfOrNull { it.screen } ?: 0) + 1
         for (screen in 0..maxScreen) {

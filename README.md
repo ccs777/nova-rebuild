@@ -51,6 +51,9 @@ is a normal launcher: set it as the default home app to use it as HOME.
 - **Widgets** — long-press an empty cell → *Widgets*, pick a provider, grant the bind permission
   when asked; the widget is hosted by `AppWidgetHost` in a `WidgetFrame` with a resize handle and
   drag support. Widget ids persist in `favorites.appWidgetId` and are re-bound on load.
+- **Shortcuts** — long-press an app → *Shortcuts* lists dynamic/manifest shortcuts through
+  `LauncherApps` (legacy `ACTION_CREATE_SHORTCUT` fallback), launches them, or places one on the
+  workspace as a `DEEP_SHORTCUT` item.
 
 ## Data model
 
@@ -108,8 +111,8 @@ app/src/main/java/dev/novare/launcher/
 
 ## Known limits
 
-Shortcuts, notification badges, Sesame integrations and Nova's scroll effects are not implemented.
-Widget placement and the bind-permission flow are exercised on device; widget span resize and
-widget re-binding after process death are implemented but not yet verified. The backup format
+Notification badges, Sesame integrations and Nova's scroll effects are not implemented. Shortcut
+listing needs the launcher to hold the default-home role (otherwise only legacy shortcuts are
+visible). The backup format
 matches Nova's ZIP-with-prefs shape but stores the item graph as JSON rather than copying
 `nova.db`.

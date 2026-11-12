@@ -8,6 +8,8 @@ import dev.novare.launcher.model.AppItem
 import dev.novare.launcher.model.Container
 import dev.novare.launcher.model.DrawerTab
 import dev.novare.launcher.model.FolderItem
+import dev.novare.launcher.model.ItemInfo
+import dev.novare.launcher.model.ItemType
 import dev.novare.launcher.model.LauncherLayout
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -72,6 +74,29 @@ class LauncherStoreTest {
         assertEquals(setOf(browserKey(), toolsKey()), tab.components)
 
         assertEquals(mapOf(browserKey() to "content://dev.novare.icons/browser"), loaded.customIcons)
+    }
+
+    @Test
+    fun widgetRowRoundTripsProviderAndSpans() {
+        val layout = LauncherLayout()
+        val widget = ItemInfo(itemType = ItemType.APPWIDGET)
+        widget.title = "Chrome search"
+        widget.appWidgetId = 42
+        widget.appWidgetProvider = ComponentName("com.android.chrome", "org.chromium.chrome.browser.searchwidget.SearchWidgetProvider")
+        widget.spanX = 3
+        widget.spanY = 2
+        widget.container = Container.DESKTOP
+        layout.desktop.add(widget)
+
+        store.save(layout)
+        val loaded = store.load().desktop.single()
+
+        assertEquals(ItemType.APPWIDGET, loaded.itemType)
+        assertEquals(42, loaded.appWidgetId)
+        assertEquals(widget.appWidgetProvider, loaded.appWidgetProvider)
+        assertEquals(3, loaded.spanX)
+        assertEquals(2, loaded.spanY)
+        assertTrue(loaded.id > 0L)
     }
 
     @Test

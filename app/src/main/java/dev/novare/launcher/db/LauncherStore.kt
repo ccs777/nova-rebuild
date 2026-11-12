@@ -1,5 +1,6 @@
 package dev.novare.launcher.db
 
+import android.content.ComponentName
 import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
@@ -33,7 +34,11 @@ class LauncherStore(context: Context) {
                 val container = c.getInt(c.getColumnIndexOrThrow("container"))
                 val itemType = c.getInt(c.getColumnIndexOrThrow("itemType"))
                 if (container == Container.DESKTOP || container == Container.HOTSEAT) {
-                    val item = if (itemType == ItemType.FOLDER) FolderItem() else appItemFrom(c) ?: continue
+                    val item = when (itemType) {
+                        ItemType.FOLDER -> FolderItem()
+                        ItemType.APPWIDGET -> ItemInfo(itemType = ItemType.APPWIDGET)
+                        else -> appItemFrom(c) ?: continue
+                    }
                     readCommon(item, c)
                     item.id = id
                     if (item is FolderItem) folders[id] = item
@@ -248,6 +253,9 @@ class LauncherStore(context: Context) {
             put("itemType", item.itemType)
             put("profileId", item.profileId)
             put("rank", rank)
+            put("appWidgetId", item.appWidgetId)
+            put("appWidgetProvider", item.appWidgetProvider?.flattenToString())
+            put("appWidgetSource", item.appWidgetSource)
             put("modified", System.currentTimeMillis())
         }
 
@@ -277,6 +285,10 @@ class LauncherStore(context: Context) {
         item.spanY = c.getFloat(c.getColumnIndexOrThrow("spanY")).toInt().coerceAtLeast(1)
         item.profileId = c.getLong(c.getColumnIndexOrThrow("profileId"))
         item.rank = c.getInt(c.getColumnIndexOrThrow("rank"))
+        item.appWidgetId = c.getInt(c.getColumnIndexOrThrow("appWidgetId"))
+        item.appWidgetSource = c.getInt(c.getColumnIndexOrThrow("appWidgetSource"))
+        val provider = c.getString(c.getColumnIndexOrThrow("appWidgetProvider"))
+        item.appWidgetProvider = provider?.let { runCatching { ComponentName.unflattenFromString(it) }.getOrNull() }
         if (item is AppItem) {
             item.intent = Intent(Intent.ACTION_MAIN).apply {
                 addCategory(Intent.CATEGORY_LAUNCHER)

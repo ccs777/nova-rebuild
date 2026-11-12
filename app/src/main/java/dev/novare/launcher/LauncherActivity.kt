@@ -34,6 +34,10 @@ import dev.novare.launcher.model.DrawerTab
 import dev.novare.launcher.model.FolderItem
 import dev.novare.launcher.model.ItemInfo
 import dev.novare.launcher.model.ItemType
+import dev.novare.launcher.shortcuts.ShortcutItemFactory
+import dev.novare.launcher.shortcuts.ShortcutRecord
+import dev.novare.launcher.shortcuts.ShortcutRepository
+import dev.novare.launcher.shortcuts.ShortcutSheet
 import dev.novare.launcher.model.LauncherChange
 import dev.novare.launcher.model.LauncherLayout
 import dev.novare.launcher.model.LauncherModel
@@ -77,6 +81,12 @@ class LauncherActivity : AppCompatActivity() {
     private var pendingIconApp: AppItem? = null
     private var dragAnchor: View? = null
     private var pendingWidgetItem: ItemInfo? = null
+
+    private val legacyShortcut = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val data = result.data ?: return@registerForActivityResult
+        val intent = data.getParcelableExtra<Intent>(Intent.EXTRA_SHORTCUT_INTENT) ?: return@registerForActivityResult
+        runCatching { startActivity(intent) }
+    }
 
     private val bindWidget = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
         val item = pendingWidgetItem
@@ -145,6 +155,7 @@ class LauncherActivity : AppCompatActivity() {
         wireViews()
         registerBackHandling()
         applyInsets()
+        restoreWidgetIds()
         rebuildAll()
     }
 
@@ -158,6 +169,7 @@ class LauncherActivity : AppCompatActivity() {
             applySettings()
             iconCache.clear()
             model.load()
+            restoreWidgetIds()
             iconCache.customIcons.clear()
             iconCache.customIcons.putAll(layout.customIcons)
             model.normalize(gridColumns, gridRows)
@@ -320,11 +332,24 @@ class LauncherActivity : AppCompatActivity() {
     }
 
     /** Wraps a hosted widget in a frame that owns selection chrome, resize and drag. */
+    /** Re-binds persisted widget ids after a restart; dangling ids get a fresh id for the provider. */
+    private fun restoreWidgetIds() {
+        val widgets = layout.desktop.filter { it.itemType == ItemType.APPWIDGET }
+        for (item in widgets) {
+            val id = widgetHost.onRestore(item, item.appWidgetProvider)
+            if (id > 0) {
+                item.appWidgetId = id
+                model.persistItem(item)
+            }
+        }
+    }
+
     private fun widgetView(item: ItemInfo): View? {
         val hostView = widgetHost.viewFor(item) ?: return null
         val frame = WidgetFrame(this)
         frame.item = item
         frame.setCellSize(widgetCellWidth(), widgetCellHeight())
+        (hostView.parent as? ViewGroup)?.removeView(hostView)
         frame.addView(
             hostView,
             FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT),
@@ -388,7 +413,34 @@ class LauncherActivity : AppCompatActivity() {
         when (item) {
             is FolderItem -> folderView.show(item)
             is AppItem -> launchApp(item)
+            else -> item.intent?.let { launchShortcutIntent(it) }
         }
+    }
+
+    private fun launchShortcutIntent(intent: Intent) {
+        if (intent.action == Intent.ACTION_CREATE_SHORTCUT) {
+            runCatching { legacyShortcut.launch(intent) }
+        } else {
+            runCatching { startActivity(intent) }
+                .onFailure { Toast.makeText(this, R.string.menu_shortcuts, Toast.LENGTH_SHORT).show() }
+        }
+    }
+
+    private fun showShortcuts(app: AppItem) {
+        ShortcutSheet.show(
+            context = this,
+            app = app,
+            repository = ShortcutRepository(this),
+            onLaunch = { record -> launchShortcutIntent(record.intent) },
+            onAddToHome = { record -> addShortcutToHome(record) },
+        )
+    }
+
+    private fun addShortcutToHome(record: ShortcutRecord) {
+        val item = ShortcutItemFactory.toItem(this, record)
+        val cell = firstVacantCell()
+        model.addToDesktop(item, cell[0], cell[1], cell[2])
+        Toast.makeText(this, record.shortLabel, Toast.LENGTH_SHORT).show()
     }
 
     private fun launchApp(app: AppItem) {
@@ -567,9 +619,10 @@ class LauncherActivity : AppCompatActivity() {
         } else if (item is AppItem) {
             popup.menu.add(0, 1, 0, R.string.menu_edit)
             popup.menu.add(0, 2, 1, R.string.menu_change_icon)
-            popup.menu.add(0, 3, 2, R.string.menu_app_info)
-            popup.menu.add(0, 4, 3, R.string.menu_uninstall)
-            popup.menu.add(0, 5, 4, R.string.menu_remove)
+            popup.menu.add(0, 6, 2, R.string.menu_shortcuts)
+            popup.menu.add(0, 3, 3, R.string.menu_app_info)
+            popup.menu.add(0, 4, 4, R.string.menu_uninstall)
+            popup.menu.add(0, 5, 5, R.string.menu_remove)
         }
         popup.setOnMenuItemClickListener { entry ->
             when (entry.itemId) {
@@ -583,6 +636,7 @@ class LauncherActivity : AppCompatActivity() {
                 }
 
                 3 -> openAppInfo((item as AppItem).component)
+                6 -> showShortcuts(item as AppItem)
                 4 -> uninstall((item as AppItem).component)
                 5 -> {
                     model.detach(item)
