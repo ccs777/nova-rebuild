@@ -26,7 +26,7 @@ class LauncherPrefs(private val context: Context) {
         set(value) = prefs.edit().putString("dock_count", value.toString()).apply()
 
     var iconSizeDp: Int
-        get() = prefs.getString("icon_size", null)?.toIntOrNull() ?: if (narrowScreen) 64 else 48
+        get() = prefs.getString("icon_size", null)?.toIntOrNull() ?: if (narrowScreen) 56 else 48
         set(value) = prefs.edit().putString("icon_size", value.toString()).apply()
 
     fun getFirstRunDone(): Boolean = prefs.getBoolean("first_run_done", false)
