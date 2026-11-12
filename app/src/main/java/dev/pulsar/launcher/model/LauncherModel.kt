@@ -214,6 +214,16 @@ class LauncherModel(context: Context) {
         var changed = false
         val occupied = HashSet<Long>()
         val affected = ArrayList<ItemInfo>()
+        // A screen with no widgets starts at the top row: pull its icons up if they begin lower.
+        for ((_, items) in layout.desktop.groupBy { it.screen }) {
+            if (items.any { it.itemType == ItemType.APPWIDGET }) continue
+            val top = items.minOf { it.cellY }
+            if (top > 0) {
+                items.forEach { it.cellY -= top }
+                affected.addAll(items)
+                changed = true
+            }
+        }
         val ordered = layout.desktop.sortedWith(
             compareBy({ it.screen }, { it.rank }, { it.cellY }, { it.cellX })
         )
