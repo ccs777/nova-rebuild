@@ -1,0 +1,40 @@
+{
+  "evidence_id": "ev_227d8ea395fe8b298655f068ab370829aa893d0fbbc9476896868336b369e512",
+  "operation": "inspect_artifact",
+  "provider": {
+    "id": "rea-artifact-graph",
+    "name": "REA safe artifact graph provider",
+    "version": "1"
+  },
+  "subject": {
+    "name": "nova-8.0.18-base.apk",
+    "digest": {
+      "sha256": "56c2cf80bd689faf0cf20e64ad1e2d87622e3d159d798c0045d6cff6d11bec2f"
+    },
+    "local_path": "/private/tmp/nova-re/artifacts/nova-8.0.18-base.apk",
+    "format": "apk",
+    "architecture": null
+  },
+  "coverage": {
+    "status": "complete-within-substeps",
+    "substeps_completed": 1,
+    "observations_retained": 1,
+    "observations_omitted": 0,
+    "hypotheses_retained": 0,
+    "hypotheses_omitted": 0,
+    "unexplored_branches_retained": 0,
+    "unexplored_branches_omitted": 0,
+    "next_probes_retained": 0,
+    "next_probes_omitted": 0
+  },
+  "limitations": [
+    "Inspection derives bounded static hypotheses and next probes; it does not execute the artifact or claim format-specific semantics.",
+    "Logical archive names collide under English (en-US) Unicode case folding; a case-insensitive destination cannot store both spellings. This comparison is not a filesystem observation.",
+    "ZIP inventory lists central-directory entries only. Non-entry bytes, including an APK Signing Block before the central directory or a ZIP comment after it, are not occurrences."
+  ],
+  "authority": "shipped-artifact",
+  "confidence": "observed",
+  "evidence_links": [
+    "ev_e9135a2b7b033cf96a566c571a1e2a6790d3158002e3305f20a71c8f8adfa8fd"
+  ]
+}
