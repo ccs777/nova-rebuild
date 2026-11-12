@@ -305,7 +305,9 @@ class LauncherActivity : AppCompatActivity() {
             page.setGrid(gridColumns, gridRows)
             page.gapPx = dp(2)
             page.iconSizePx = iconSizePx
-            page.setPadding(dp(10), if (hasWidgets()) dp(6) else 0, dp(10), dp(6))
+            // narrow phones: tight side margins so the columns spread toward the edges
+            val sidePad = if (resources.configuration.screenWidthDp < 380) dp(2) else dp(10)
+            page.setPadding(sidePad, if (hasWidgets()) dp(6) else 0, sidePad, dp(6))
             page.widgetViewProvider = { item ->
                 if (item.itemType == ItemType.APPWIDGET) widgetView(item) else null
             }
