@@ -66,6 +66,7 @@ class LauncherActivity : AppCompatActivity() {
     private lateinit var hotseat: CellLayout
     private lateinit var indicator: LinearLayout
     private lateinit var bottomBar: View
+    private lateinit var topPills: View
     private lateinit var drawerBar: View
     private lateinit var drawer: AllAppsView
     private lateinit var folderView: FolderView
@@ -121,6 +122,11 @@ class LauncherActivity : AppCompatActivity() {
         hotseat = findViewById(R.id.hotseat)
         indicator = findViewById(R.id.page_indicator)
         bottomBar = findViewById(R.id.bottom_bar)
+        topPills = findViewById(R.id.top_pills)
+        findViewById<View>(R.id.pill_search).setOnClickListener { openDrawer() }
+        findViewById<View>(R.id.pill_weather).setOnClickListener {
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/search?q=weather")))
+        }
         drawerBar = findViewById(R.id.drawer_bar)
         drawer = findViewById(R.id.all_apps)
         folderView = findViewById(R.id.folder_view)
@@ -289,6 +295,7 @@ class LauncherActivity : AppCompatActivity() {
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             bottomBar.setPadding(0, 0, 0, bars.bottom)
             systemTop = bars.top
+            topPills.setPadding(dp(12), bars.top + dp(12), dp(12), dp(4))
             applyTopInset()
             insets
         }
