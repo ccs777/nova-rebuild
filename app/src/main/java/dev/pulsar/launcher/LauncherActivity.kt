@@ -275,11 +275,21 @@ class LauncherActivity : AppCompatActivity() {
         }
     }
 
+    private var systemTop = 0
+
+    private fun hasWidgets(): Boolean = layout.desktop.any { it.itemType == ItemType.APPWIDGET }
+
+    // No widget on the desktop: workspace starts at the very top. With widgets: keep the status-bar inset.
+    private fun applyTopInset() {
+        pager.setPadding(0, if (hasWidgets()) systemTop else 0, 0, 0)
+    }
+
     private fun applyInsets() {
         ViewCompat.setOnApplyWindowInsetsListener(dragLayer) { _, insets ->
             val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             bottomBar.setPadding(0, 0, 0, bars.bottom)
-            pager.setPadding(0, bars.top, 0, 0)
+            systemTop = bars.top
+            applyTopInset()
             insets
         }
     }
@@ -295,7 +305,7 @@ class LauncherActivity : AppCompatActivity() {
             page.setGrid(gridColumns, gridRows)
             page.gapPx = dp(2)
             page.iconSizePx = iconSizePx
-            page.setPadding(dp(10), dp(6), dp(10), dp(6))
+            page.setPadding(dp(10), if (hasWidgets()) dp(6) else 0, dp(10), dp(6))
             page.widgetViewProvider = { item ->
                 if (item.itemType == ItemType.APPWIDGET) widgetView(item) else null
             }
@@ -308,6 +318,7 @@ class LauncherActivity : AppCompatActivity() {
             pages.add(page)
         }
         pager.setPages(pages)
+        applyTopInset()
 
         hotseat.setGrid(dockCount, 1)
         hotseat.gapPx = dp(2)
