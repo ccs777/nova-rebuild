@@ -7,11 +7,11 @@
     "version": "1"
   },
   "subject": {
-    "name": "nova-8.0.18-base.apk",
+    "name": "ref-8.0.18-base.apk",
     "digest": {
       "sha256": "56c2cf80bd689faf0cf20e64ad1e2d87622e3d159d798c0045d6cff6d11bec2f"
     },
-    "local_path": "/private/tmp/nova-re/artifacts/nova-8.0.18-base.apk",
+    "local_path": "/private/tmp/nova-re/artifacts/ref-8.0.18-base.apk",
     "format": "apk",
     "architecture": null
   },
