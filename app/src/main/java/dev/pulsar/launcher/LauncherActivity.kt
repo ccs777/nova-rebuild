@@ -2,10 +2,14 @@ package dev.pulsar.launcher
 
 import android.app.AlertDialog
 import android.appwidget.AppWidgetProviderInfo
+import android.content.BroadcastReceiver
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.graphics.drawable.GradientDrawable
 import android.net.Uri
+import android.os.BatteryManager
 import android.os.Bundle
 import android.os.SystemClock
 import android.provider.Settings
@@ -16,10 +20,12 @@ import android.widget.EditText
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.PopupMenu
+import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import dev.pulsar.launcher.app.AppRepository
@@ -67,6 +73,7 @@ class LauncherActivity : AppCompatActivity() {
     private lateinit var indicator: LinearLayout
     private lateinit var bottomBar: View
     private lateinit var topPills: View
+    private lateinit var batteryText: TextView
     private lateinit var drawerBar: View
     private lateinit var drawer: AllAppsView
     private lateinit var folderView: FolderView
@@ -123,10 +130,13 @@ class LauncherActivity : AppCompatActivity() {
         indicator = findViewById(R.id.page_indicator)
         bottomBar = findViewById(R.id.bottom_bar)
         topPills = findViewById(R.id.top_pills)
+        batteryText = findViewById(R.id.battery_text)
         findViewById<View>(R.id.pill_search).setOnClickListener { openDrawer() }
         findViewById<View>(R.id.pill_weather).setOnClickListener {
             startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.google.com/search?q=weather")))
         }
+        findViewById<View>(R.id.top_settings).setOnClickListener { openSettings() }
+        findViewById<View>(R.id.search_settings).setOnClickListener { openSettings() }
         drawerBar = findViewById(R.id.drawer_bar)
         drawer = findViewById(R.id.all_apps)
         folderView = findViewById(R.id.folder_view)
@@ -183,9 +193,47 @@ class LauncherActivity : AppCompatActivity() {
         }
     }
 
+    override fun onStart() {
+        super.onStart()
+        val sticky = ContextCompat.registerReceiver(
+            this,
+            batteryReceiver,
+            IntentFilter(Intent.ACTION_BATTERY_CHANGED),
+            ContextCompat.RECEIVER_NOT_EXPORTED,
+        )
+        showBattery(sticky)
+    }
+
+    override fun onStop() {
+        runCatching { unregisterReceiver(batteryReceiver) }
+        super.onStop()
+    }
+
     override fun onDestroy() {
         appRepo.stop()
         super.onDestroy()
+    }
+
+    // ------------------------------------------------------------- top bar
+
+    private val batteryReceiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context, intent: Intent) = showBattery(intent)
+    }
+
+    private fun showBattery(intent: Intent?) {
+        if (intent == null || !::batteryText.isInitialized) return
+        val level = intent.getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+        val scale = intent.getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+        if (level < 0 || scale <= 0) return
+        val percent = level * 100 / scale
+        val status = intent.getIntExtra(BatteryManager.EXTRA_STATUS, -1)
+        val charging = status == BatteryManager.BATTERY_STATUS_CHARGING ||
+            status == BatteryManager.BATTERY_STATUS_FULL
+        batteryText.text = if (charging) "$percent% charging" else "$percent%"
+    }
+
+    private fun openSettings() {
+        startActivity(Intent(this, SettingsActivity::class.java))
     }
 
     // ---------------------------------------------------------------- settings
@@ -224,11 +272,14 @@ class LauncherActivity : AppCompatActivity() {
             if (!drawer.isOpen) openDrawer()
         }
         dragLayer.onSwipeDown = {
-            if (prefs.swipeDownExpandsNotifications) {
-                val expanded = LauncherAccessibilityService.expandNotifications()
-                if (!expanded) {
-                    Toast.makeText(this, R.string.accessibility_description, Toast.LENGTH_LONG).show()
-                    runCatching { startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) }
+            if (!drawer.isOpen && folderView.visibility != View.VISIBLE) {
+                if (prefs.swipeDownExpandsNotifications) {
+                    if (!NotificationShade.expand(this)) {
+                        Toast.makeText(this, R.string.accessibility_description, Toast.LENGTH_LONG).show()
+                        runCatching { startActivity(Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS)) }
+                    }
+                } else {
+                    openDrawer()
                 }
             }
         }
@@ -710,7 +761,7 @@ class LauncherActivity : AppCompatActivity() {
         popup.menu.add(0, 3, 2, R.string.widgets_title)
         popup.setOnMenuItemClickListener { entry ->
             when (entry.itemId) {
-                1 -> startActivity(Intent(this, SettingsActivity::class.java))
+                1 -> openSettings()
                 2 -> runCatching { startActivity(Intent(Intent.ACTION_SET_WALLPAPER)) }
                 3 -> WidgetPicker.show(this) { info -> addWidget(info) }
             }

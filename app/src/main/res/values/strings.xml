@@ -40,7 +40,8 @@
     <string name="pref_icon_size">Icon size (dp)</string>
     <string name="pref_gestures">Gestures</string>
     <string name="pref_swipe_up">Swipe up on home opens the app drawer</string>
-    <string name="pref_swipe_down">Swipe down expands notifications (needs accessibility)</string>
+    <string name="pref_swipe_down">Swipe down opens notifications</string>
+    <string name="pref_swipe_down_summary">Off: swipe down opens the app drawer</string>
     <string name="pref_drawer">App drawer</string>
     <string name="pref_drawer_tabs">Show drawer tabs</string>
     <string name="pref_icon_pack">Icon pack</string>

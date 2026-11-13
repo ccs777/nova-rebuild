@@ -40,6 +40,7 @@
         <SwitchPreferenceCompat
             android:defaultValue="false"
             android:key="swipe_down_notifications"
+            android:summary="@string/pref_swipe_down_summary"
             android:title="@string/pref_swipe_down" />
     </PreferenceCategory>
 
